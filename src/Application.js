@@ -17,7 +17,7 @@ class S3Image extends Component {
     if (!src) return null;
     return (
       <article>
-        <img src={src} />
+        <img src={src} alt='foo123' />
       </article>
     );
   }
@@ -39,7 +39,10 @@ class Application extends Component {
     const file = this.fileInput.files[0];
     const { name } = file;
 
-    console.log(file, name);
+    Storage.put(name, file).then(response => {
+      console.log('Storage.put', { response });
+      this.setState({ files: [...this.state.files, response]});
+      });
   };
 
   render() {
