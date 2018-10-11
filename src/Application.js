@@ -1,10 +1,37 @@
 import React, { Component } from 'react';
 import './Application.css';
 
+import { Storage } from 'aws-amplify';
+
+class S3Image extends Component {
+  state = { src: null }
+
+  async componentDidMount() {
+    const { s3key } = this.props;
+    const src = await Storage.get(s3key);
+    this.setState({ src });
+  }
+
+  render() {
+    const { src } = this.state;
+    if (!src) return null;
+    return (
+      <article>
+        <img src={src} />
+      </article>
+    );
+  }
+}
+
 class Application extends Component {
   state = {
     files: []
   };
+
+  async componentDidMount() {
+    const files = await Storage.list('');
+    this.setState({ files });
+  }
 
   handleSubmit = event => {
     event.preventDefault();
@@ -26,7 +53,9 @@ class Application extends Component {
           <input className="full-width" type="submit" />
         </form>
         <section className="Application-images">
-
+          {this.state.files.map(file => {
+	    return <S3Image s3key={file.key} key={file.key} />;
+	  })}
         </section>
       </div>
     );
